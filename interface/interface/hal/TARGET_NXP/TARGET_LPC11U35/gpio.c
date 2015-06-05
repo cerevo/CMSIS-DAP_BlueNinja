@@ -34,27 +34,23 @@ static OS_TID isr_notify;
 #define RESET_INT_MASK    (1 << RESET_INT_CH)
 #endif
 
-#define PIN_DAP_LED       (1<<21)
-#define PIN_MSD_LED       (1<<20)
-#define PIN_CDC_LED       (1<<11)
+#define PIN_DAP_LED       (1<<16)
+#define PIN_MSD_LED       (1<<16)
+#define PIN_CDC_LED       (1<<16)
 
 void gpio_init(void) {
     // enable clock for GPIO port 0
     LPC_SYSCON->SYSAHBCLKCTRL |= (1UL << 6);
 
     // configure GPIO-LED as output
-    // DAP led (green)
-    LPC_GPIO->DIR[0]  |= (PIN_DAP_LED);
-    LPC_GPIO->CLR[0]  |= (PIN_DAP_LED);
+    // DAP/MSD/CDC led (green)
+    LPC_GPIO->DIR[0]  |= (1<<16);
+    LPC_GPIO->CLR[0]  |= (1<<16);
 
-    // MSD led (red)
-    LPC_GPIO->DIR[0]  |= (PIN_MSD_LED);
-    LPC_GPIO->CLR[0]  |= (PIN_MSD_LED);
-
-    // Serial LED (blue)
-      LPC_IOCON->TDI_PIO0_11 |= 0x01;
-    LPC_GPIO->DIR[0]  |= (PIN_CDC_LED);
-    LPC_GPIO->CLR[0]  |= (PIN_CDC_LED);
+    // POWER led (red)
+    LPC_IOCON->SWDIO_PIO0_15 |= 0x05;   //PIO0_15 / PullDown
+    LPC_GPIO->DIR[0]  |= (1<<15);
+    LPC_GPIO->CLR[0]  |= (1<<15);
 
     // configure Button as input
 #if SW_RESET_BUTTON

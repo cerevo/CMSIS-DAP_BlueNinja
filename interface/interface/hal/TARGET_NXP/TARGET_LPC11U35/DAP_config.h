@@ -210,7 +210,11 @@ static __inline void PORT_SWD_SETUP (void) {
     LPC_GPIO->CLR[0]  =  PIN_nRESET; 
     LPC_GPIO->DIR[0] |= (PIN_SWCLK | PIN_SWDIO);
 #else
+    #if defined(RESET_POS)
+    LPC_GPIO->CLR[0] = PIN_nRESET;
+    #else
     LPC_GPIO->SET[0] = PIN_nRESET;
+    #endif
     LPC_GPIO->DIR[0]  |= (PIN_SWCLK | PIN_SWDIO | PIN_nRESET);
 #endif
 }
@@ -228,7 +232,11 @@ static __inline void PORT_OFF (void) {
     LPC_GPIO->CLR[0]  =  PIN_nRESET;
     LPC_GPIO->DIR[0] |= (PIN_SWCLK | PIN_SWDIO); 
 #else
+    #if defined(RESET_POS)
+    LPC_GPIO->CLR[0] = PIN_nRESET;
+    #else
     LPC_GPIO->SET[0] = PIN_nRESET;
+    #endif
     LPC_GPIO->DIR[0] |= (PIN_SWCLK | PIN_SWDIO | PIN_nRESET);
 #endif
 }
@@ -395,10 +403,17 @@ static __forceinline void     PIN_nRESET_OUT (uint32_t bit) {
     if (bit) LPC_GPIO->DIR[0] &= ~PIN_nRESET; // input (pulled high external)
     else     LPC_GPIO->DIR[0] |=  PIN_nRESET; // output (low)
 #else
+    #if defined(RESET_POS)
+    if (bit)
+        LPC_GPIO->CLR[0] = (PIN_nRESET);
+    else
+        LPC_GPIO->SET[0] = (PIN_nRESET);    
+    #else
     if (bit)
         LPC_GPIO->SET[0] = (PIN_nRESET);
     else
         LPC_GPIO->CLR[0] = (PIN_nRESET);
+    #endif
 #endif
 }
 
