@@ -94,10 +94,10 @@
 #define BOARD_ID        "1062"
 #define BOARD_SECRET    "xxxxxxxx"
 
-#elif defined (BOARD_TZ1000)
-#define BOARD_ID				"0000"
-#define BOARD_SECRET		"xxxxxxxx"
-
+#elif defined (BOARD_CEREVO_TZ1)
+#define BOARD_ID		"0000"
+#define BOARD_SECRET	"xxxxxxxx"
+#include <LPC11Uxx.h>
 #endif
 
 #if !defined(BOARD_SECRET) || !defined(BOARD_ID)
@@ -112,4 +112,10 @@ BOARD board = {
 
 /* Weak declaration of the board_init function for boards that don't use it */
 __weak void board_init(void) {
+#if defined(BOARD_CEREVO_TZ1)
+  // POWER HOLD 
+  LPC_IOCON->TDO_PIO0_13 |= 0x01;     //PIO0_13 / 
+  LPC_GPIO->DIR[0] |= (1 << 13);
+  LPC_GPIO->CLR[0] |= (1 << 13);
+#endif
 }

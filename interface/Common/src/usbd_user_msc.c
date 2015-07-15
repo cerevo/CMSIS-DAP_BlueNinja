@@ -65,6 +65,9 @@
 #elif defined(DBG_LPC4337)
 #   define WANTED_SIZE_IN_KB                        (1024)
 #elif defined(DBG_TZ1000)
+    #include <LPC11Uxx.h>
+    #define HOLD_POWSW                              LPC_GPIO->SET[0] |= (1<<13)
+    #define RELEASE_POW_SW                          LPC_GPIO->CLR[0] |= (1<<13)
 #   define WANTED_SIZE_IN_KB                        (1024)
 #endif
 
@@ -227,7 +230,7 @@ static const mbr_t mbr = {
     .not_used = 0,
     .boot_record_signature = 0x29,
     .volume_id = 0x27021974,
-    .volume_label = {'M','b','e','d',' ','U','S','B',' ',' ',' '},
+    .volume_label = {'C','D','P','-','T','Z','0','1','B',' ',' '},
     .file_system_type = {'F','A','T','1','2',' ',' ',' '},
 
     /* Executable boot code that starts the operating system */
@@ -292,7 +295,7 @@ static const uint8_t fail[] = {
 // first 16 of the max 32 (mbr.max_root_dir_entries) root dir entries
 static const uint8_t root_dir1[] = {
     // volume label "MBED"
-    'M', 'B', 'E', 'D', 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x28, 0x0, 0x0, 0x0, 0x0,
+    'C', 'D', 'P', '-', 'T', 'Z', '0', '1', 'B', 0x20, 0x20, 0x28, 0x0, 0x0, 0x0, 0x0,
     0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x85, 0x75, 0x8E, 0x41, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
 
     // Hidden files to keep mac happy
@@ -332,8 +335,12 @@ static const uint8_t root_dir1[] = {
     0x73, 0x43, 0x73, 0x43, 0x00, 0x00, 0x86, 0x8A, 0x73, 0x43, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00,
 
     // mbed html file (size 512, cluster 3)
-    'M', 'B', 'E', 'D', 0x20, 0x20, 0x20, 0x20, 'H', 'T', 'M', 0x20, 0x18, 0xB1, 0x74, 0x76,
+//    'M', 'B', 'E', 'D', 0x20, 0x20, 0x20, 0x20, 'H', 'T', 'M', 0x20, 0x18, 0xB1, 0x74, 0x76,
+//    0x8E, 0x41, 0x8E, 0x41, 0x0, 0x0, 0x8E, 0x76, 0x8E, 0x41, 0x05, 0x0, 0x00, 0x02, 0x0, 0x0,
+
+    'D', 'E', 'T', 'E', 'C', 'T', 'E', 'D', ' ', ' ', ' ', 0x20, 0x18, 0xB1, 0x74, 0x76,
     0x8E, 0x41, 0x8E, 0x41, 0x0, 0x0, 0x8E, 0x76, 0x8E, 0x41, 0x05, 0x0, 0x00, 0x02, 0x0, 0x0,
+
 };
 
 // last 16 of the max 32 (mbr.max_root_dir_entries) root dir entries
@@ -572,6 +579,13 @@ static void initDisconnect(uint8_t success) {
     drag_success = success;
     if (autorst)
         swd_set_target_state(RESET_RUN);
+
+#if defined(BOARD_CEREVO_TZ1)
+    // Release power switch.
+    RELEASE_POW_SW;
+    os_dly_wait(100);
+#endif
+    
     main_blink_msd_led(0);
     init(1);
     isr_evt_set(MSC_TIMEOUT_STOP_EVENT, msc_valid_file_timeout_task_id);
@@ -596,7 +610,12 @@ int jtag_init() {
             initDisconnect(0);
             return 1;
         }
-
+        
+#if defined(BOARD_CEREVO_TZ1)
+        //Hold power switch
+        HOLD_POWSW;
+        os_dly_wait(100);
+#endif
         semihost_disable();
 
         PORT_SWD_SETUP();

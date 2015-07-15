@@ -6738,9 +6738,9 @@
             <useXO>0</useXO>
             <VariousControls>
               <MiscControls></MiscControls>
-              <Define>TARGET_LPC11U35, __RTX, DBG_TZ1000, BOARD_TZ1000, SOFT_RESET, RESET_POS</Define>
+              <Define>TARGET_LPC11U35, __RTX, DBG_TZ1000, BOARD_CEREVO_TZ1, SOFT_RESET, RESET_POS</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\shared\USBStack\INC;..\..\Common\inc;..\..\Common\src;..\..\target\hal\DBG_TOSHIBA\DBG_TZ1000;..\..\interface\hal\TARGET_NXP\TARGET_LPC11U35;..\..\interface\cmsis;..\..\interface\cmsis\TARGET_NXP\TARGET_LPC11UXX;..\..\..\shared\rtos</IncludePath>
+              <IncludePath>..\..\..\shared\USBStack\INC;..\..\Common\inc;..\..\Common\src;..\..\target\hal\DBG_TOSHIBA\DBG_TZ1000;..\..\interface\hal\TARGET_NXP\TARGET_LPC11U35;..\..\interface\cmsis;..\..\interface\cmsis\TARGET_NXP\TARGET_LPC11UXX;..\..\..\shared\rtos;..\..\..\bootloader\Common\inc</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>

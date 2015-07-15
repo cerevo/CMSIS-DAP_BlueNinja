@@ -51,7 +51,7 @@ void gpio_init(void) {
     LPC_IOCON->SWDIO_PIO0_15 |= 0x05;   //PIO0_15 / PullDown
     LPC_GPIO->DIR[0]  |= (1<<15);
     LPC_GPIO->CLR[0]  |= (1<<15);
-
+    
     // configure Button as input
 #if SW_RESET_BUTTON
     LPC_GPIO->DIR[RESET_PORT]  &= ~(1 << RESET_PIN);

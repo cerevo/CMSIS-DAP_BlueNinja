@@ -25,6 +25,7 @@
     #define GIT_LOCAL_MODS_STR "No"
 #endif
 
+/*
 const unsigned char WebSide[] = {
 "<!-- mbed Microcontroller Website and Authentication Shortcut -->\r\n"
 "<!-- Version: " FW_BUILD " Build: " __DATE__ " " __TIME__ " Git Commit SHA: "  GIT_COMMIT_SHA " Git local mods:" GIT_LOCAL_MODS_STR"-->\r\n"
@@ -36,5 +37,6 @@ const unsigned char WebSide[] = {
 "<body></body>\r\n"
 "</html>\r\n"
 "\r\n"};
-
+*/
+const unsigned char WebSide[] = {" "};
 #endif
