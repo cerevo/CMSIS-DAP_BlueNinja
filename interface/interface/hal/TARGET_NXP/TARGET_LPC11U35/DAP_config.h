@@ -232,7 +232,7 @@ static __inline void PORT_OFF (void) {
     LPC_GPIO->CLR[0]  =  PIN_nRESET;
     LPC_GPIO->DIR[0] |= (PIN_SWCLK | PIN_SWDIO); 
 #else
-    #if defined(RESET_POS)
+    #if defined(CEREVO_TZ1_SB)
     LPC_GPIO->CLR[0] = PIN_nRESET;
     #else
     LPC_GPIO->SET[0] = PIN_nRESET;
@@ -403,7 +403,7 @@ static __forceinline void     PIN_nRESET_OUT (uint32_t bit) {
     if (bit) LPC_GPIO->DIR[0] &= ~PIN_nRESET; // input (pulled high external)
     else     LPC_GPIO->DIR[0] |=  PIN_nRESET; // output (low)
 #else
-    #if defined(RESET_POS)
+    #if defined(CEREVO_TZ1_SB)
     if (bit)
         LPC_GPIO->CLR[0] = (PIN_nRESET);
     else
