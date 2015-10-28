@@ -210,7 +210,7 @@ static __inline void PORT_SWD_SETUP (void) {
     LPC_GPIO->CLR[0]  =  PIN_nRESET; 
     LPC_GPIO->DIR[0] |= (PIN_SWCLK | PIN_SWDIO);
 #else
-    #if defined(RESET_POS)
+    #if defined(CEREVO_TZ1_SB)
     LPC_GPIO->CLR[0] = PIN_nRESET;
     #else
     LPC_GPIO->SET[0] = PIN_nRESET;
