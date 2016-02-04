@@ -48,7 +48,12 @@ void gpio_init(void) {
     // enable clock for GPIO port 0
     LPC_SYSCON->SYSAHBCLKCTRL |= (1UL << 6);
 
-#if defined(CEREVO_TZ1_SB)
+#if defined(BOARD_CEREVO_TZ1) && defined(CEREVO_TZ1_SB)
+    // POWER HOLD 
+    LPC_IOCON->TDO_PIO0_13 |= 0x01;     //PIO0_13 / 
+    LPC_GPIO->DIR[0] |= (1 << 13);
+    LPC_GPIO->CLR[0] |= (1 << 13);    
+    
     // configure GPIO-LED as output
     // DAP/MSD/CDC led (green)
     LPC_GPIO->DIR[0]  |= (1<<16);
@@ -127,6 +132,18 @@ void gpio_enable_button_flag(OS_TID task, uint16_t flags) {
     NVIC_EnableIRQ(FLEX_INT0_IRQn);
 #endif
 }
+
+#if defined(BOARD_CEREVO_TZ1) && defined(CEREVO_TZ1_SB)
+void gpio_hold_powersw(void)
+{
+    LPC_GPIO->SET[0] |= (1<<13);
+}
+
+void gpio_release_powersw(void)
+{
+    LPC_GPIO->CLR[0] |= (1<<13);
+}
+#endif
 
 void FLEX_INT0_IRQHandler() {
     isr_evt_set(isr_flags, isr_notify);

@@ -28,6 +28,11 @@
 #include "swd_host.h"
 #include "usb_buf.h"
 
+#if defined(BOARD_CEREVO_TZ1) && defined(CEREVO_TZ1_SB)
+void gpio_hold_powersw(void);
+void gpio_release_powersw(void);
+#endif
+
 #if defined(DBG_LPC1768)
 #   define WANTED_SIZE_IN_KB                        (512)
 #elif defined(DBG_KL02Z)
@@ -65,9 +70,6 @@
 #elif defined(DBG_LPC4337)
 #   define WANTED_SIZE_IN_KB                        (1024)
 #elif defined(DBG_TZ1000)
-    #include <LPC11Uxx.h>
-    #define HOLD_POWSW                              LPC_GPIO->SET[0] |= (1<<13)
-    #define RELEASE_POW_SW                          LPC_GPIO->CLR[0] |= (1<<13)
 #   define WANTED_SIZE_IN_KB                        (1024)
 #endif
 
@@ -580,9 +582,9 @@ static void initDisconnect(uint8_t success) {
     if (autorst)
         swd_set_target_state(RESET_RUN);
 
-#if defined(BOARD_CEREVO_TZ1)
+#if defined(BOARD_CEREVO_TZ1) && defined(CEREVO_TZ1_SB)
     // Release power switch.
-    RELEASE_POW_SW;
+    gpio_release_powersw();
     os_dly_wait(100);
 #endif
     
@@ -611,9 +613,9 @@ int jtag_init() {
             return 1;
         }
         
-#if defined(BOARD_CEREVO_TZ1)
+#if defined(BOARD_CEREVO_TZ1) && defined(CEREVO_TZ1_SB)
         //Hold power switch
-        HOLD_POWSW;
+        gpio_hold_powersw();
         os_dly_wait(100);
 #endif
         semihost_disable();
@@ -899,6 +901,10 @@ void usbd_msc_write_sect (uint32_t block, uint8_t *buf, uint32_t num_of_blocks) 
 
         // .bin file exists
         if (idx_size != -1) {
+            // init jtag if needed
+            if (jtag_init() == 1) {
+                return;
+            }
 
             if (sector_received_first == 0) {
                 root_dir_received_first = 1;
@@ -939,11 +945,6 @@ void usbd_msc_write_sect (uint32_t block, uint8_t *buf, uint32_t num_of_blocks) 
 
         if (!flash_started && (block > theoretical_start_sector)) {
             theoretical_start_sector = block;
-        }
-
-        // init jtag if needed
-        if (jtag_init() == 1) {
-            return;
         }
 
         if (jtag_flash_init == 1) {
