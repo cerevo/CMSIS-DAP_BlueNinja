@@ -7551,7 +7551,7 @@
             <InvalidFlash>1</InvalidFlash>
           </TargetStatus>
           <OutputDirectory>.\Obj\lpc11u35_tz10xx\</OutputDirectory>
-          <OutputName>lpc11u35_tz1000_tg-lpc11u35-501_if</OutputName>
+          <OutputName>lpc11u35_tz10xx_tg-lpc11u35-501_if</OutputName>
           <CreateExecutable>1</CreateExecutable>
           <CreateLib>0</CreateLib>
           <CreateHexFile>0</CreateHexFile>
