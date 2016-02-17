@@ -483,6 +483,10 @@ static __inline void DAP_SETUP (void) {
 	PIN_TDI_IOCON       = FUNC_0 | PULL_UP_ENABLED;  // TDI
 	PIN_TDO_IOCON       = FUNC_0 | PULL_UP_ENABLED;  // TDO
 #endif
+#if defined(DBG_TZ1000)
+    LPC_IOCON->PIO0_9   = FUNC_0;                    // TDI
+    LPC_IOCON->PIO0_22  = FUNC_0;                    // TDO
+#endif
 }
 
 /** Reset Target Device with custom specific I/O pin or command sequence.

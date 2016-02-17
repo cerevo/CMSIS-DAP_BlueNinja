@@ -41,6 +41,10 @@
     #define USE_USB_EJECT_INSERT
 #endif
 
+#if defined(DBG_TZ1000)
+#include "DAP_config.h"
+#endif
+
 // Event flags for main task
 // Timers events
 #define FLAGS_MAIN_90MS           (1 << 0)
@@ -66,7 +70,7 @@
 // USB busy time
 #define USB_BUSY_TIME           (10)
 // Delay before a USB device connect may occur
-#define USB_CONNECT_DELAY       (2)
+#define USB_CONNECT_DELAY       (6)
 // Delay before target may be taken out of reset or reprogrammed after startup
 #define STARTUP_DELAY           (0)
 // Decrement to zero
@@ -310,7 +314,9 @@ __task void main_task(void) {
     // Setup reset button
     gpio_enable_button_flag(main_task_id, FLAGS_MAIN_RESET);
     button_activated = 1;
-
+#ifdef DBG_TZ1000
+    uart_port_release();
+#endif
     // USB
     usbd_connect(0);
     usb_busy = USB_IDLE;
@@ -331,6 +337,9 @@ __task void main_task(void) {
 
     // start semihost task
     semihost_init();
+#ifdef DBG_TZ1000
+    PORT_OFF();
+#endif
     semihost_enable();
 
     while(1) {
@@ -464,12 +473,17 @@ __task void main_task(void) {
                 case USB_DISCONNECT_CONNECT:
                     // Wait until USB is idle before disconnecting
                     if ((usb_busy == USB_IDLE) && (DECZERO(usb_state_count) == 0)) {
+#if defined(DBG_TZ1000)
+                        usbd_connect(0);
+                        NVIC_SystemReset();
+#else
                         usbd_connect(0);
                         usb_state = USB_CONNECTING;
                         // Update HTML file
                         update_html_file();
 						// Delay the connecting state before reconnecting to the host - improved usage with VMs
 						usb_state_count = 10; //(90ms * 10 = 900ms)
+#endif
                     }
                     break;
 
@@ -491,7 +505,6 @@ __task void main_task(void) {
                         usb_state = USB_CONNECTED;
                     }
                     break;
-
                 case USB_CONNECTED:
                 case USB_DISCONNECTED:
                 default:

@@ -73,4 +73,14 @@ extern int32_t  uart_write_free                  (void);
 extern int32_t  uart_write_data                  (uint8_t *data, uint16_t size);
 extern int32_t  uart_read_data                   (uint8_t *data, uint16_t size);
 
+#if defined(DBG_TZ1000)
+#include <LPC11Uxx.h>
+__inline void uart_port_release(void)
+{
+    LPC_IOCON->PIO0_18 &= ~0x18;
+    LPC_IOCON->PIO0_19 &= ~0x18;
+}
+#endif
+
+
 #endif /* __UART_H */

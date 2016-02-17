@@ -596,6 +596,12 @@ static void initDisconnect(uint8_t success) {
         // event to disconnect the usb
         main_usb_disconnect_event();
     }
+
+#if defined(DBG_TZ1000)
+    PORT_OFF();
+    jtag_flash_init = 0;
+#endif
+
     semihost_enable();
 }
 
