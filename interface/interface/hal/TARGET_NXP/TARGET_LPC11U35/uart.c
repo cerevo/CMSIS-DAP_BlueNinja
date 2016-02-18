@@ -46,11 +46,11 @@ int32_t uart_initialize (void) {
 
     // usart clk divider = 1
     LPC_SYSCON->UARTCLKDIV = (1UL << 0);
-
+#if !(defined(DBG_TZ1000) && defined(CEREVO_TZ1_SB))
     // alternate function USART and PullNone
     LPC_IOCON->PIO0_18 |= 0x01;
     LPC_IOCON->PIO0_19 |= 0x01;
-
+#endif
     // enable FIFOs (trigger level 1) and clear them
     LPC_USART->FCR = 0x87;
 

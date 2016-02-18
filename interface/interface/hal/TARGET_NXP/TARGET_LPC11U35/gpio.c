@@ -60,9 +60,9 @@ void gpio_init(void) {
     LPC_GPIO->CLR[0]  |= (1<<16);
 
     // POWER led (red)
-    LPC_IOCON->SWDIO_PIO0_15 |= 0x05;   //PIO0_15 / PullDown
+    LPC_IOCON->SWDIO_PIO0_15 = 0x00000491; //PIO0_15/PULLUP/DIGITAL/OPENDRAIN
     LPC_GPIO->DIR[0]  |= (1<<15);
-    LPC_GPIO->CLR[0]  |= (1<<15);
+    LPC_GPIO->SET[0]  = (1<<15);
 #else
     // configure GPIO-LED as output
     // DAP led (green)
@@ -74,7 +74,7 @@ void gpio_init(void) {
     LPC_GPIO->CLR[0]  |= (PIN_MSD_LED);
 
     // Serial LED (blue)
-      LPC_IOCON->TDI_PIO0_11 |= 0x01;
+    LPC_IOCON->TDI_PIO0_11 |= 0x01;
     LPC_GPIO->DIR[0]  |= (PIN_CDC_LED);
     LPC_GPIO->CLR[0]  |= (PIN_CDC_LED);
 #endif

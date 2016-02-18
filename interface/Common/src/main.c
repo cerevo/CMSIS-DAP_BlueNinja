@@ -315,7 +315,7 @@ __task void main_task(void) {
     gpio_enable_button_flag(main_task_id, FLAGS_MAIN_RESET);
     button_activated = 1;
 #ifdef DBG_TZ1000
-    uart_port_release();
+    uart_port_disable();
 #endif
     // USB
     usbd_connect(0);
@@ -473,17 +473,14 @@ __task void main_task(void) {
                 case USB_DISCONNECT_CONNECT:
                     // Wait until USB is idle before disconnecting
                     if ((usb_busy == USB_IDLE) && (DECZERO(usb_state_count) == 0)) {
-#if defined(DBG_TZ1000)
                         usbd_connect(0);
                         NVIC_SystemReset();
-#else
                         usbd_connect(0);
                         usb_state = USB_CONNECTING;
                         // Update HTML file
                         update_html_file();
 						// Delay the connecting state before reconnecting to the host - improved usage with VMs
 						usb_state_count = 10; //(90ms * 10 = 900ms)
-#endif
                     }
                     break;
 
@@ -558,8 +555,39 @@ __task void main_task(void) {
                 // Update hardware
                 gpio_set_cdc_led(cdc_led_value);
             }
+#if defined(DBG_TZ1000) && defined(CEREVO_TZ1_SB)
+            {
+                /* CDP-TZ01* SB TZ10xx Power detect */
+                uint32_t dr6;
+                uint16_t v6;
+                if ((LPC_ADC->CR & 0x03000000) == 0) {
+                    LPC_GPIO->CLR[0] = (1<<15);
+                    
+                    LPC_SYSCON->SYSAHBCLKCTRL |= 0x00002000;
+                    LPC_SYSCON->PDRUNCFG &= ~0x00000010;
+                    
+                    LPC_ADC->INTEN = 0x00000000;
+                    //ADC start (START=1,BURST=1,SEL=AD6)
+                    LPC_ADC->CR = 0x01000140;
+                }
 
-        }
+                dr6 = LPC_ADC->DR6;
+                if ((dr6 & 0x80000000) != 0) {
+                    LPC_ADC->CR = 0x01000140;
+
+                    v6 = ((dr6 >> 6) & 0x03ff);
+                    
+                    if (v6 > 500) {
+                        LPC_GPIO->NOT[0] = (1<<15);
+                        uart_port_enable();
+                    } else {
+                        LPC_GPIO->CLR[0] = (1<<15);
+                        uart_port_disable();
+                    }
+                }
+            }
+#endif
+       }
     }
 }
 
