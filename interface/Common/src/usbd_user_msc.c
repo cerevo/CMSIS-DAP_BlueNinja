@@ -907,10 +907,6 @@ void usbd_msc_write_sect (uint32_t block, uint8_t *buf, uint32_t num_of_blocks) 
 
         // .bin file exists
         if (idx_size != -1) {
-            // init jtag if needed
-            if (jtag_init() == 1) {
-                return;
-            }
 
             if (sector_received_first == 0) {
                 root_dir_received_first = 1;
@@ -951,6 +947,11 @@ void usbd_msc_write_sect (uint32_t block, uint8_t *buf, uint32_t num_of_blocks) 
 
         if (!flash_started && (block > theoretical_start_sector)) {
             theoretical_start_sector = block;
+        }
+
+        // init jtag if needed
+        if (jtag_init() == 1) {
+            return;
         }
 
         if (jtag_flash_init == 1) {
