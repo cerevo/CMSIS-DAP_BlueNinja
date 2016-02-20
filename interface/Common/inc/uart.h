@@ -73,12 +73,16 @@ extern int32_t  uart_write_free                  (void);
 extern int32_t  uart_write_data                  (uint8_t *data, uint16_t size);
 extern int32_t  uart_read_data                   (uint8_t *data, uint16_t size);
 
-#if defined(DBG_TZ1000)
+#if defined(BOARD_CEREVO_TZ1) && (CEREVO_TZ1_SB)
 #include <LPC11Uxx.h>
-__inline void uart_port_enable(void)
+__inline void uart_tz10xx_is_enable(void)
 {
-    LPC_IOCON->PIO0_18 |= 0x01;
-    LPC_IOCON->PIO0_19 |= 0x01;
+    /* CDP-TZ01* SB: Detect TZ10xx's UART is enable. */
+    if (LPC_USART->LCR & 0x40) {
+        if (LPC_GPIO->PIN[0] & (1<<18)) {
+            LPC_USART->LCR &= ~0x40;
+        }
+    }
 }
 
 __inline void uart_port_disable(void)

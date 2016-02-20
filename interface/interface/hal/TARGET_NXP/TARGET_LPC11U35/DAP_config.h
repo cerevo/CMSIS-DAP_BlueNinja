@@ -485,11 +485,7 @@ static __inline void DAP_SETUP (void) {
 #endif
 #if defined(DBG_TZ1000)
     LPC_IOCON->PIO0_9   = FUNC_0;                    // TDI
-#if defined(CEREVO_TZ1_SB)
-    LPC_IOCON->PIO0_22  = FUNC_1;                    // TZ10xx power detect(AD6)
-#else
     LPC_IOCON->PIO0_22  = FUNC_0;                    // TDO
-#endif
 #endif
 }
 

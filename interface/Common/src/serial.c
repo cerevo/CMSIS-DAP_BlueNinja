@@ -21,31 +21,14 @@ extern OS_ID serial_mailbox;
 
 UART_Configuration uart_config;
 
-#if defined(DBG_TZ1000) && (CEREVO_TZ1_SB)
-#include <stdbool.h>
-bool is_initialized = false;
-#endif
-
 int32_t serial_initialize(void)
 {
-#if defined(DBG_TZ1000) && (CEREVO_TZ1_SB)
-    if (is_initialized) {
-        return 1;
-    }
-    is_initialized = true;
-#endif
     os_mbx_send(&serial_mailbox, (void*)SERIAL_INITIALIZE, 0);
     return 1;
 }
 
 int32_t serial_uninitialize(void)
 {
-#if defined(DBG_TZ1000) && (CEREVO_TZ1_SB)
-    if (!is_initialized) {
-        return 1;
-    }
-    is_initialized = false;
-#endif
     os_mbx_send(&serial_mailbox, (void*)SERIAL_UNINITIALIZE, 0);
     return 1;
 }

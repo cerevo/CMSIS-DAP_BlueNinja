@@ -556,38 +556,12 @@ __task void main_task(void) {
                 gpio_set_cdc_led(cdc_led_value);
             }
 #if defined(DBG_TZ1000) && defined(CEREVO_TZ1_SB)
-            {
-                /* CDP-TZ01* SB TZ10xx Power detect */
-                uint32_t dr6;
-                uint16_t v6;
-                if ((LPC_ADC->CR & 0x03000000) == 0) {
-                    LPC_GPIO->CLR[0] = (1<<15);
-                    
-                    LPC_SYSCON->SYSAHBCLKCTRL |= 0x00002000;
-                    LPC_SYSCON->PDRUNCFG &= ~0x00000010;
-                    
-                    LPC_ADC->INTEN = 0x00000000;
-                    //ADC start (START=1,BURST=1,SEL=AD6)
-                    LPC_ADC->CR = 0x01000140;
-                }
-
-                dr6 = LPC_ADC->DR6;
-                if ((dr6 & 0x80000000) != 0) {
-                    LPC_ADC->CR = 0x01000140;
-
-                    v6 = ((dr6 >> 6) & 0x03ff);
-                    
-                    if (v6 > 500) {
-                        LPC_GPIO->NOT[0] = (1<<15);
-                        uart_port_enable();
-                    } else {
-                        LPC_GPIO->CLR[0] = (1<<15);
-                        uart_port_disable();
-                    }
-                }
+            if (usb_state == USB_CONNECTED) {
+                //Detect TZ10xx's UART is enable.
+                uart_tz10xx_is_enable();
             }
 #endif
-       }
+        }
     }
 }
 

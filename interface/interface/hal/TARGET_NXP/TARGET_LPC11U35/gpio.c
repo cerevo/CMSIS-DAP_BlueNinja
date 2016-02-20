@@ -62,7 +62,7 @@ void gpio_init(void) {
     // POWER led (red)
     LPC_IOCON->SWDIO_PIO0_15 = 0x00000491; //PIO0_15/PULLUP/DIGITAL/OPENDRAIN
     LPC_GPIO->DIR[0]  |= (1<<15);
-    LPC_GPIO->SET[0]  = (1<<15);
+    LPC_GPIO->CLR[0]  = (1<<15);
 #else
     // configure GPIO-LED as output
     // DAP led (green)

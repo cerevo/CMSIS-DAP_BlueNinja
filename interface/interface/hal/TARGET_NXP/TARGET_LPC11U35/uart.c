@@ -46,11 +46,11 @@ int32_t uart_initialize (void) {
 
     // usart clk divider = 1
     LPC_SYSCON->UARTCLKDIV = (1UL << 0);
-#if !(defined(DBG_TZ1000) && defined(CEREVO_TZ1_SB))
+
     // alternate function USART and PullNone
     LPC_IOCON->PIO0_18 |= 0x01;
     LPC_IOCON->PIO0_19 |= 0x01;
-#endif
+
     // enable FIFOs (trigger level 1) and clear them
     LPC_USART->FCR = 0x87;
 
@@ -62,7 +62,11 @@ int32_t uart_initialize (void) {
 
     // enable rx and tx interrupt
     LPC_USART->IER |= (1 << 0) | (1 << 1);
-
+#if (defined(DBG_TZ1000) && defined(CEREVO_TZ1_SB))
+    LPC_USART->IER |= (1 << 2);
+    //Send break
+    LPC_USART->LCR |= 0x40;
+#endif
     NVIC_EnableIRQ(UART_IRQn);
 
     return 1;
@@ -203,7 +207,8 @@ int32_t uart_set_configuration (UART_Configuration *config) {
 
     LPC_USART->LCR = (data_bits << 0)
                    | (stop_bits << 2)
-                   | (parity << 3);
+                   | (parity << 3)
+                   | (LPC_USART->LCR & 0x40);
 
     // Enable UART interrupt
     NVIC_EnableIRQ (UART_IRQn);
@@ -352,7 +357,14 @@ void UART_IRQHandler (void) {
 
     // read interrupt status
     iir = LPC_USART->IIR;
-
+#if defined(BOARD_CEREVO_TZ1) && (CEREVO_TZ1_SB)
+    if ((iir & 0x0e) == 0x06) {
+        //Break indicate
+        if (LPC_USART->LSR & 0x10) {
+            LPC_USART->LCR |= 0x40; //Break enable
+        }
+    }
+#endif
     // handle character to transmit
     if (write_buffer.cnt_in != write_buffer.cnt_out) {
         // if THR is empty
